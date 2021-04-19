@@ -6,6 +6,7 @@
 # That's the color code for Gnome terminal. Is there difference for other OS?
 class String
   def color(code)
+    # First: Foreground dark (3) or light (9). Second: Color.
     "\e[#{code}m#{self}\e[0m"
   end
 
@@ -34,12 +35,36 @@ class String
   end
 end
 
+# 6 Colors to choose from.
+# 4 slots to fill. 12 guesses total.
 class GameBoard
+  def initialize(guesses = 12, pegs = 4, content = '_______')
+    @board = create_board(guesses, pegs, content)
+  end
+
+  def display
+    @board.each do |row|
+      row.each { |column| print "|#{column}" }
+      # feedback in codemaker class? How should they interact?
+      print "|\n"
+    end
+  end
+
+  private
+
+  def create_board(guesses, pegs, content)
+    Array.new(guesses, Array.new(pegs, content))
+  end
 end
 
+# Stores 4 color code.
+# 6 Colors to choose from.
+# matches guesess against code.
+# provide feedback on correct color and position, and correct color wrong pos
 class CodeMaker
 end
 
+# Guesses code out of 6 colors. 12 Geusses.
 class CodeBreaker
 end
 
@@ -58,6 +83,7 @@ class Play
     puts 'Blue'.blue
     puts 'Magenta'.magenta
     puts 'Cyan'.cyan
+    @game_board.display
   end
 end
 
