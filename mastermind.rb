@@ -67,7 +67,12 @@ class GameBoard
       # feedback in codemaker class? How should they interact?
       print "|\n"
     end
-    @board[0] = [red, green, yellow, blue]
+  end
+
+  def place_guess(code)
+    @board[@guess] = code
+    @guess += 1
+    @guess == @final_guess
   end
 
   private
@@ -99,6 +104,31 @@ end
 
 # Guesses code out of 6 colors. 12 Geusses.
 class CodeBreaker
+  include Peg
+
+  def new_guess(pegs = 4)
+    # [peg_array.sample, peg_array.sample, peg_array.sample, peg_array.sample]
+    guess_array = []
+    pegs.times { guess_array.push(user_color) }
+    guess_array
+  end
+
+  private
+
+  def user_color
+    print 'What color? '
+    peg_array.each do |color|
+      word = color.tr('_', '')
+      initial = word.chars[5].downcase
+      print "#{word}(#{initial}) "
+    end
+    print ': '
+    user_input
+  end
+
+  def user_input
+    gets
+  end
 end
 
 # Make other classes protected? do it above initialize?
@@ -111,7 +141,19 @@ class Play
 
   def game
     @game_board.secret_code = @code_maker.maker_code
+    game_loop
+  end
+
+  private
+
+  def game_loop
     @game_board.display
+    loop do
+      # gets
+      break if @game_board.place_guess(@code_breaker.new_guess)
+
+      @game_board.display
+    end
     @game_board.display
   end
 end
