@@ -4,50 +4,70 @@
 # There is a colorize gem, but I didn't want to require others to install it.
 # https://www.growingwiththeweb.com/2015/05/colours-in-gnome-terminal.html
 # That's the color code for Gnome terminal. Is there difference for other OS?
-class String
-  def color(code)
-    # First: Foreground dark (3) or light (9). Second: Color.
-    "\e[#{code}m#{self}\e[0m"
+# First: Foreground, dark (3) or light (9). Second: Color.
+module Peg
+  def empty_peg
+    # 9 characters
+    '_________'
+  end
+
+  def peg_array
+    [red, green, yellow, blue, magenta, cyan]
+  end
+
+  def color(new_color, code)
+    "\e[#{code}m#{new_color}\e[0m"
   end
 
   def red
-    color(31)
+    color('_Red_____', 31)
   end
 
   def green
-    color(92)
+    color('_Green___', 92)
   end
 
   def yellow
-    color(93)
+    color('_Yellow__', 93)
   end
 
   def blue
-    color(94)
+    color('_Blue____', 94)
   end
 
   def magenta
-    color(95)
+    color('_Magenta_', 95)
   end
 
   def cyan
-    color(96)
+    color('_Cyan____', 96)
   end
 end
 
 # 6 Colors to choose from.
 # 4 slots to fill. 12 guesses total.
 class GameBoard
-  def initialize(guesses = 12, pegs = 4, content = '_______')
+  include Peg
+  attr_writer :secret_code
+
+  def initialize(guesses = 12, pegs = 4, content = empty_peg)
     @board = create_board(guesses, pegs, content)
+    @guess = 0
+    @final_guess = guesses
+    @secret_code = []
   end
 
   def display
+    print "\n"
+    @secret_code.each { |word| print "|#{word}" }
+    print '|'
+    print "\n_________________________________________\n"
     @board.each do |row|
       row.each { |column| print "|#{column}" }
       # feedback in codemaker class? How should they interact?
       print "|\n"
     end
+    @board[0] = [red, green, yellow, blue]
   end
 
   private
@@ -62,6 +82,19 @@ end
 # matches guesess against code.
 # provide feedback on correct color and position, and correct color wrong pos
 class CodeMaker
+  include Peg
+  attr_reader :maker_code
+
+  def initialize
+    @maker_code = random_code
+  end
+
+  private
+
+  def random_code
+    # 'peg_array.sample(4)' works, except each element is unique.
+    [peg_array.sample, peg_array.sample, peg_array.sample, peg_array.sample]
+  end
 end
 
 # Guesses code out of 6 colors. 12 Geusses.
@@ -77,12 +110,8 @@ class Play
   end
 
   def game
-    puts 'Red'.red
-    puts 'Green'.green
-    puts 'Yellow'.yellow
-    puts 'Blue'.blue
-    puts 'Magenta'.magenta
-    puts 'Cyan'.cyan
+    @game_board.secret_code = @code_maker.maker_code
+    @game_board.display
     @game_board.display
   end
 end
