@@ -68,36 +68,63 @@ class GameBoard
   include Peg
   attr_writer :secret_code
 
-  def initialize(guesses = 12, pegs = 4, content = empty_peg)
-    @board = create_board(guesses, pegs, content)
+  def initialize(guess_total = 12, pegs = 4, content = empty_peg)
     @guess = 0
-    @final_guess = guesses
     @secret_code = []
+    @guess_total = guess_total
+    @pegs = pegs
+    @board = create_board(guess_total, pegs, content)
   end
 
+  # def new_turn_display
+  #   cp = 0
+  #   cc = 0
+  #   display(cp, cc)
+  #   win_game?(cp)
+  # end
+
   def display
-    print "\n"
-    @secret_code.each { |word| print "|#{word}" }
-    print '|'
+    display_code
     print "\n_________________________________________\n"
     @board.each do |row|
       row.each { |column| print "|#{column}" }
-      # feedback in codemaker class? How should they interact?
       print "|\n"
     end
   end
 
-  def place_guess(code)
+  def update_board(code)
     @board[@guess] = code
+    @board[@guess] += [match_position, 0]
     @guess += 1
-    @guess == @final_guess
+  end
+
+  def last_guess?
+    @guess == @guess_total
   end
 
   private
 
-  def create_board(guesses, pegs, content)
-    Array.new(guesses, Array.new(pegs, content))
+  def create_board(guess_total, pegs, content)
+    # Array format: ['____', '____', '____', '____', 0, 0]
+    Array.new(guess_total, Array.new(pegs, content).push(0, 0))
   end
+
+  def display_code
+    print "\n"
+    @secret_code.each { |word| print "|#{word}" }
+    print '|'
+  end
+
+  def match_position
+    amount = 0
+    @board[@guess].each_with_index do |word, index|
+      word == @secret_code[index] ? amount += 1 : false
+    end
+    amount
+  end
+  # def win_game?(color_match, pegs = 4)
+  #   color_match == pegs
+  # end
 end
 
 # Stores 4 color code.
@@ -123,7 +150,7 @@ class CodeMaker
   end
 end
 
-# Guesses code out of 6 colors. 12 Geusses.
+# Guesses code out of 6 colors. 12 Guesses.
 class CodeBreaker
   include Peg
 
@@ -168,19 +195,19 @@ class Play
 
   def game
     @game_board.secret_code = @code_maker.maker_code
+    @game_board.display
     game_loop
   end
 
   private
 
   def game_loop
-    @game_board.display
     loop do
-      break if @game_board.place_guess(@code_breaker.new_guess)
-
+      @game_board.update_board(@code_breaker.new_guess)
       @game_board.display
+      break if @game_board.last_guess?
+
     end
-    @game_board.display
   end
 end
 
