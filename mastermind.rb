@@ -4,18 +4,36 @@
 # There is a colorize gem, but I didn't want to require others to install it.
 # https://www.growingwiththeweb.com/2015/05/colours-in-gnome-terminal.html
 # That's the color code for Gnome terminal. Is there difference for other OS?
-# First: Foreground, dark (3) or light (9). Second: Color.
 module Peg
   def empty_peg
-    # 9 characters
+    # 9 characters, for display purposes.
     '_________'
   end
 
-  def peg_array
+  def peg_methods
+    # Modify this with new colors etc. Everything flows from here.
+    # Obviously add the corresponding method aswell.
     [red, green, yellow, blue, magenta, cyan]
   end
 
+  def peg_names
+    # Keeps the color coding.
+    array = []
+    peg_methods.each { |method| array.push(method.tr('_', '')) }
+    array
+  end
+
+  def peg_initials
+    # Removes color coding. Since it needs to match user input. 'r' == 'r' etc.
+    array = []
+    peg_methods.each { |method| array.push(method.chars[6].downcase) }
+    array
+  end
+
   def color(new_color, code)
+    # First: Foreground, regular (3) or light (9). Second: Color.
+    # Background, regular (4), light (10).
+    # Add additional codes by seperating with ; - 31;40 etc
     "\e[#{code}m#{new_color}\e[0m"
   end
 
@@ -98,7 +116,10 @@ class CodeMaker
 
   def random_code
     # 'peg_array.sample(4)' works, except each element is unique.
-    [peg_array.sample, peg_array.sample, peg_array.sample, peg_array.sample]
+    [
+      peg_methods.sample, peg_methods.sample,
+      peg_methods.sample, peg_methods.sample
+    ]
   end
 end
 
@@ -107,31 +128,34 @@ class CodeBreaker
   include Peg
 
   def new_guess(pegs = 4)
-    # [peg_array.sample, peg_array.sample, peg_array.sample, peg_array.sample]
     guess_array = []
-    pegs.times { guess_array.push(user_color) }
+    # pegs.times { guess_array.push(peg_methods.sample) }
+    pegs.times { guess_array.push(user_selection) }
     guess_array
   end
 
   private
 
-  def user_color
-    print 'What color? '
-    peg_array.each do |color|
-      word = color.tr('_', '')
-      initial = word.chars[5].downcase
-      print "#{word}(#{initial}) "
-    end
-    print ': '
+  def user_selection
+    output_color_selection
     user_input
   end
 
+  def output_color_selection
+    print 'What color?'
+    peg_methods.each_index do |index|
+      print " #{peg_names[index]}(#{peg_initials[index]})"
+    end
+    print ':'
+  end
+
   def user_input
-    gets
+    until peg_initials.any?(selection = gets.chomp); end
+    selection
   end
 end
 
-# Make other classes protected? do it above initialize?
+# Create this class to start program.
 class Play
   def initialize
     @game_board = GameBoard.new
@@ -149,7 +173,6 @@ class Play
   def game_loop
     @game_board.display
     loop do
-      # gets
       break if @game_board.place_guess(@code_breaker.new_guess)
 
       @game_board.display
