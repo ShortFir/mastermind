@@ -127,10 +127,13 @@ end
 class CodeBreaker
   include Peg
 
-  def new_guess(pegs = 4)
+  def new_guess(pegs = 4, user = 'human')
     guess_array = []
-    # pegs.times { guess_array.push(peg_methods.sample) }
-    pegs.times { guess_array.push(user_selection) }
+    if user == 'human'
+      pegs.times { guess_array.push(peg_methods[user_selection]) }
+    else
+      pegs.times { guess_array.push(peg_methods.sample) }
+    end
     guess_array
   end
 
@@ -138,7 +141,7 @@ class CodeBreaker
 
   def user_selection
     output_color_selection
-    user_input
+    peg_index
   end
 
   def output_color_selection
@@ -149,9 +152,9 @@ class CodeBreaker
     print ':'
   end
 
-  def user_input
+  def peg_index
     until peg_initials.any?(selection = gets.chomp); end
-    selection
+    peg_initials.index(selection)
   end
 end
 
