@@ -78,7 +78,7 @@ class GameBoard
   end
 
   def display
-    display_secret_code
+    # display_secret_code
     display_divider
     display_header
     display_divider
@@ -132,17 +132,17 @@ class GameBoard
     end
   end
 
-  def position_match
-    amount = 0
-    @board[@current_guess].each_with_index do |word, index|
-      word == @secret_code[index] ? amount += 1 : false
-    end
-    amount
-  end
+  # def position_match
+  #   amount = 0
+  #   @board[@current_guess].each_with_index do |word, index|
+  #     word == @secret_code[index] ? amount += 1 : false
+  #   end
+  #   amount
+  # end
 
-  def color_match
-    0
-  end
+  # def color_match
+  #   0
+  # end
 
   def position_color_match
     secret = Array.new(@secret_code) # Otherwise it passes the reference?
@@ -160,9 +160,11 @@ class GameBoard
     #     end
     #   end
     # end
-    array1 = Array.new(match_remove(secret, current))
-    array2 = Array.new(match_remove(array1[0].sort, array1[1].sort))
-    [array1[2], array2[2]]
+    # array1 = Array.new(match_remove(secret, current))
+    # array2 = Array.new(match_any(array1[0], array1[1]))
+    array1 = match_remove(secret, current)
+    col = match_any(array1[0], array1[1])
+    [array1[2], col]
   end
 
   def match_remove(array1, array2, amount = 0, index = 0)
@@ -178,6 +180,20 @@ class GameBoard
       end
     end
     [array1, array2, amount]
+  end
+
+  def match_any(array1, array2, amount = 0, index = 0)
+    # until array2[index].nil?
+    array1.length.times do
+      if array1.any?(array2[index])
+        array2.delete_at(index)
+        amount += 1
+      else
+        index += 1
+      end
+    end
+    # [array1, array2, amount]
+    amount
   end
 end
 
@@ -210,29 +226,34 @@ end
 class CodeBreaker
   include Peg
 
-  def new_guess(pegs = 4, user = 'human')
+  def initialize(pegs = 4, user = 'human')
+    @pegs = pegs
+    @user = user
+  end
+
+  def new_guess
     guess_array = []
-    if user == 'human'
-      pegs.times { guess_array.push(peg_methods[user_selection]) }
+    if @user == 'human'
+      @pegs.times { |ind| guess_array.push(peg_methods[user_selection(ind)]) }
     else
-      pegs.times { guess_array.push(peg_methods.sample) }
+      @pegs.times { guess_array.push(peg_methods.sample) }
     end
     guess_array
   end
 
   private
 
-  def user_selection
-    output_color_selection
+  def user_selection(ind)
+    output_color_selection(ind)
     peg_index
   end
 
-  def output_color_selection
-    print 'What color?'
+  def output_color_selection(ind)
     peg_methods.each_index do |index|
       print " #{peg_names[index]}(#{peg_initials[index]})"
     end
-    print ':'
+    print " - Peg #{ind + 1}:"
+    # print ':'
   end
 
   def peg_index
