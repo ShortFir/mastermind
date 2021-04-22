@@ -69,11 +69,12 @@ class GameBoard
   attr_writer :secret_code
 
   def initialize(guess_total = 12, pegs = 4, content = empty_peg)
-    @guess = 0
+    @current_guess = 0
     @secret_code = []
     @guess_total = guess_total
     @pegs = pegs
-    @board = create_board(guess_total, pegs, content)
+    @content = content
+    @board = create_board
   end
 
   # def new_turn_display
@@ -85,39 +86,58 @@ class GameBoard
 
   def display
     display_code
-    print "\n_________________________________________\n"
-    @board.each do |row|
-      row.each { |column| print "|#{column}" }
-      print "|\n"
-    end
+    display_divider
+    display_header
+    display_divider
+    display_board
+    display_divider
+    puts
   end
 
   def update_board(code)
-    @board[@guess] = code
-    @board[@guess] += [match_position, 0]
-    @guess += 1
+    @board[@current_guess] = code
+    @board[@current_guess] += [match_position, 0]
+    @current_guess += 1
   end
 
   def last_guess?
-    @guess == @guess_total
+    @current_guess == @guess_total
   end
 
   private
 
-  def create_board(guess_total, pegs, content)
+  def create_board
     # Array format: ['____', '____', '____', '____', 0, 0]
-    Array.new(guess_total, Array.new(pegs, content).push(0, 0))
+    Array.new(@guess_total, Array.new(@pegs, @content).push(0, 0))
   end
 
   def display_code
-    print "\n"
+    puts
     @secret_code.each { |word| print "|#{word}" }
-    print '|'
+    print "|\n"
+  end
+
+  def display_divider
+    print '-------------------------------------------------------------'
+  end
+
+  def display_header
+    print "\n|  Peg 1  |  Peg 2  |  Peg 3  |  Peg 4  | Col&Pos |  Color  |\n"
+  end
+
+  def display_board
+    puts
+    @board.each do |row|
+      row.each do |column|
+        column.is_a?(Integer) ? (print "|    #{column}    ") : (print "|#{column}")
+      end
+      print "|\n"
+    end
   end
 
   def match_position
     amount = 0
-    @board[@guess].each_with_index do |word, index|
+    @board[@current_guess].each_with_index do |word, index|
       word == @secret_code[index] ? amount += 1 : false
     end
     amount
