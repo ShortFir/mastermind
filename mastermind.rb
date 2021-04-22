@@ -77,15 +77,8 @@ class GameBoard
     @board = create_board
   end
 
-  # def new_turn_display
-  #   cp = 0
-  #   cc = 0
-  #   display(cp, cc)
-  #   win_game?(cp)
-  # end
-
   def display
-    display_code
+    display_secret_code
     display_divider
     display_header
     display_divider
@@ -96,12 +89,16 @@ class GameBoard
 
   def update_board(code)
     @board[@current_guess] = code
-    @board[@current_guess] += [match_position, 0]
+    @board[@current_guess].concat(position_color_match)
     @current_guess += 1
   end
 
   def last_guess?
     @current_guess == @guess_total
+  end
+
+  def winner?
+    @board[@current_guess - 1][-2] == @pegs
   end
 
   private
@@ -111,7 +108,7 @@ class GameBoard
     Array.new(@guess_total, Array.new(@pegs, @content).push(0, 0))
   end
 
-  def display_code
+  def display_secret_code
     puts
     @secret_code.each { |word| print "|#{word}" }
     print "|\n"
@@ -135,16 +132,53 @@ class GameBoard
     end
   end
 
-  def match_position
+  def position_match
     amount = 0
     @board[@current_guess].each_with_index do |word, index|
       word == @secret_code[index] ? amount += 1 : false
     end
     amount
   end
-  # def win_game?(color_match, pegs = 4)
-  #   color_match == pegs
-  # end
+
+  def color_match
+    0
+  end
+
+  def position_color_match
+    secret = Array.new(@secret_code) # Otherwise it passes the reference?
+    current = Array.new(@board[@current_guess])
+    # pos = 0
+    # col = 0
+    # current.each_with_index do |word, index|
+    #   if secret.any?(word)
+    #     col += 1
+    #     if secret[index] == word
+    #       col -= 1
+    #       pos += 1
+    #       secret.delete_at(index)
+    #       current.delete_at(index)
+    #     end
+    #   end
+    # end
+    array1 = Array.new(match_remove(secret, current))
+    array2 = Array.new(match_remove(array1[0].sort, array1[1].sort))
+    [array1[2], array2[2]]
+  end
+
+  def match_remove(array1, array2, amount = 0, index = 0)
+    # amount, index = 0, 0
+    # @pegs.times do
+    until array1[index].nil?
+      if array1[index] == array2[index]
+        array1.delete_at(index)
+        array2.delete_at(index)
+        amount += 1
+      else
+        index += 1
+      end
+    end
+    [array1, array2, amount]
+  end
 end
 
 # Stores 4 color code.
@@ -155,21 +189,23 @@ class CodeMaker
   include Peg
   attr_reader :maker_code
 
-  def initialize
+  def initialize(pegs = 4)
+    @pegs = pegs
     @maker_code = random_code
   end
 
   private
 
   def random_code
-    # 'peg_array.sample(4)' works, except each element is unique.
-    [
-      peg_methods.sample, peg_methods.sample,
-      peg_methods.sample, peg_methods.sample
-    ]
+    # 'peg_methods.sample(@pegs)' works, except each element is unique.
+    # This way can get repeat colors.
+    array = []
+    @pegs.times { array.push(peg_methods.sample) }
+    array
   end
 end
 
+# Maybe have these 2 methods have parent Player class?
 # Guesses code out of 6 colors. 12 Guesses.
 class CodeBreaker
   include Peg
@@ -225,8 +261,12 @@ class Play
     loop do
       @game_board.update_board(@code_breaker.new_guess)
       @game_board.display
-      break if @game_board.last_guess?
-
+      break if @game_board.winner? || @game_board.last_guess?
+    end
+    if @game_board.winner?
+      puts 'Code Breaker Wins!'
+    else
+      puts 'Code Maker Wins! (You Lose)'
     end
   end
 end
