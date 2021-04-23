@@ -78,6 +78,7 @@ class GameBoard
   end
 
   def display
+    puts display_divider
     # display_secret_code
     display_divider
     display_header
@@ -101,6 +102,12 @@ class GameBoard
     @board[@current_guess - 1][-2] == @pegs
   end
 
+  def display_secret_code
+    print "\n Code Was:"
+    @secret_code.each { |word| print "|#{word}" }
+    print "|\n\n"
+  end
+
   private
 
   def create_board
@@ -108,23 +115,19 @@ class GameBoard
     Array.new(@guess_total, Array.new(@pegs, @content).push(0, 0))
   end
 
-  def display_secret_code
-    puts
-    @secret_code.each { |word| print "|#{word}" }
-    print "|\n"
-  end
-
   def display_divider
-    print '-------------------------------------------------------------'
+    print '-----------------------------------------------------------------------'
   end
 
   def display_header
-    print "\n|  Peg 1  |  Peg 2  |  Peg 3  |  Peg 4  | Col&Pos |  Color  |\n"
+    print "\n|  Guess  |  Peg 1  |  Peg 2  |  Peg 3  |  Peg 4  | Col&Pos |  Color  |\n"
   end
 
   def display_board
     puts
-    @board.each do |row|
+    @board.each_with_index do |row, index|
+      temp_i = index < 9 ? " #{index + 1}" : (index + 1).to_s
+      print "|   #{temp_i}    "
       row.each do |column|
         column.is_a?(Integer) ? (print "|    #{column}    ") : (print "|#{column}")
       end
@@ -132,67 +135,38 @@ class GameBoard
     end
   end
 
-  # def position_match
-  #   amount = 0
-  #   @board[@current_guess].each_with_index do |word, index|
-  #     word == @secret_code[index] ? amount += 1 : false
-  #   end
-  #   amount
-  # end
-
-  # def color_match
-  #   0
-  # end
-
   def position_color_match
     secret = Array.new(@secret_code) # Otherwise it passes the reference?
     current = Array.new(@board[@current_guess])
-    # pos = 0
-    # col = 0
-    # current.each_with_index do |word, index|
-    #   if secret.any?(word)
-    #     col += 1
-    #     if secret[index] == word
-    #       col -= 1
-    #       pos += 1
-    #       secret.delete_at(index)
-    #       current.delete_at(index)
-    #     end
-    #   end
-    # end
-    # array1 = Array.new(match_remove(secret, current))
-    # array2 = Array.new(match_any(array1[0], array1[1]))
-    array1 = match_remove(secret, current)
-    col = match_any(array1[0], array1[1])
-    [array1[2], col]
+    first_pass = match_remove(secret, current)
+    col = match_any(first_pass[0], first_pass[1])
+    [first_pass[2], col]
   end
 
-  def match_remove(array1, array2, amount = 0, index = 0)
-    # amount, index = 0, 0
-    # @pegs.times do
-    until array1[index].nil?
-      if array1[index] == array2[index]
-        array1.delete_at(index)
-        array2.delete_at(index)
+  def match_remove(secret1, guess1, amount = 0, index = 0)
+    until secret1[index].nil?
+      if secret1[index] == guess1[index]
+        secret1.delete_at(index)
+        guess1.delete_at(index)
         amount += 1
       else
         index += 1
       end
     end
-    [array1, array2, amount]
+    [secret1, guess1, amount]
   end
 
-  def match_any(array1, array2, amount = 0, index = 0)
-    # until array2[index].nil?
-    array1.length.times do
-      if array1.any?(array2[index])
-        array2.delete_at(index)
+  def match_any(secret2, guess2, amount = 0, ind = 0)
+    # secret2.length.times do
+    until guess2[ind].nil?
+      if secret2.any?(guess2[ind])
+        secret2.delete_at(secret2.index(guess2[ind]))
+        guess2.delete_at(ind)
         amount += 1
       else
-        index += 1
+        ind += 1
       end
     end
-    # [array1, array2, amount]
     amount
   end
 end
@@ -226,7 +200,7 @@ end
 class CodeBreaker
   include Peg
 
-  def initialize(pegs = 4, user = 'human')
+  def initialize(pegs = 4, user = 'robot')
     @pegs = pegs
     @user = user
   end
@@ -284,11 +258,16 @@ class Play
       @game_board.display
       break if @game_board.winner? || @game_board.last_guess?
     end
-    if @game_board.winner?
-      puts 'Code Breaker Wins!'
-    else
-      puts 'Code Maker Wins! (You Lose)'
-    end
+    @game_board.display_secret_code
+    @game_board.winner? ? (puts win) : (puts lose)
+  end
+
+  def win
+    ' Code Breaker Wins!'
+  end
+
+  def lose
+    ' Code Maker Wins! (You Lose)'
   end
 end
 
