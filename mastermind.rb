@@ -63,22 +63,23 @@ module Peg
 end
 
 # 6 Colors to choose from.
-# 4 slots to fill. 12 guesses total.
 class GameBoard
   include Peg
   attr_writer :secret_code
 
-  def initialize(guess_total = 12, pegs = 4, content = empty_peg)
+  def initialize(guess_total, pegs)
     @current_guess = 0
     @secret_code = []
     @guess_total = guess_total
     @pegs = pegs
-    @content = content
+    @content = empty_peg # From Peg Module
     @board = create_board
   end
 
   def display
-    puts display_divider
+    puts
+    display_divider
+    puts
     # display_secret_code
     display_divider
     display_header
@@ -98,7 +99,7 @@ class GameBoard
     @current_guess == @guess_total
   end
 
-  def winner?
+  def breaker_wins?
     @board[@current_guess - 1][-2] == @pegs
   end
 
@@ -116,11 +117,14 @@ class GameBoard
   end
 
   def display_divider
-    print '-----------------------------------------------------------------------'
+    print '-----------'
+    @board[0].length.times { print '----------' }
   end
 
   def display_header
-    print "\n|  Guess  |  Peg 1  |  Peg 2  |  Peg 3  |  Peg 4  | Col&Pos |  Color  |\n"
+    print "\n|  Guess  "
+    (@board[0].length - 2).times { |idx| print "|  Peg #{idx + 1}  " }
+    print "| Col&Pos |  Color  |\n"
   end
 
   def display_board
@@ -136,7 +140,7 @@ class GameBoard
   end
 
   def position_color_match
-    secret = Array.new(@secret_code) # Otherwise it passes the reference?
+    secret = Array.new(@secret_code) # Otherwise it passes the reference???
     current = Array.new(@board[@current_guess])
     first_pass = match_remove(secret, current)
     col = match_any(first_pass[0], first_pass[1])
@@ -156,30 +160,26 @@ class GameBoard
     [secret1, guess1, amount]
   end
 
-  def match_any(secret2, guess2, amount = 0, ind = 0)
-    # secret2.length.times do
-    until guess2[ind].nil?
-      if secret2.any?(guess2[ind])
-        secret2.delete_at(secret2.index(guess2[ind]))
-        guess2.delete_at(ind)
+  def match_any(secret2, guess2, amount = 0, idx = 0)
+    until guess2[idx].nil?
+      if secret2.any?(guess2[idx])
+        secret2.delete_at(secret2.index(guess2[idx]))
+        guess2.delete_at(idx)
         amount += 1
       else
-        ind += 1
+        idx += 1
       end
     end
     amount
   end
 end
 
-# Stores 4 color code.
-# 6 Colors to choose from.
-# matches guesess against code.
-# provide feedback on correct color and position, and correct color wrong pos
+# Parent class?
 class CodeMaker
   include Peg
   attr_reader :maker_code
 
-  def initialize(pegs = 4)
+  def initialize(pegs)
     @pegs = pegs
     @maker_code = random_code
   end
@@ -196,11 +196,10 @@ class CodeMaker
 end
 
 # Maybe have these 2 methods have parent Player class?
-# Guesses code out of 6 colors. 12 Guesses.
 class CodeBreaker
   include Peg
 
-  def initialize(pegs = 4, user = 'robot')
+  def initialize(pegs, user)
     @pegs = pegs
     @user = user
   end
@@ -227,7 +226,6 @@ class CodeBreaker
       print " #{peg_names[index]}(#{peg_initials[index]})"
     end
     print " - Peg #{ind + 1}:"
-    # print ':'
   end
 
   def peg_index
@@ -238,13 +236,8 @@ end
 
 # Create this class to start program.
 class Play
-  def initialize
-    @game_board = GameBoard.new
-    @code_maker = CodeMaker.new
-    @code_breaker = CodeBreaker.new
-  end
-
   def game
+    new_game(12, 4, 'human')
     @game_board.secret_code = @code_maker.maker_code
     @game_board.display
     game_loop
@@ -252,14 +245,20 @@ class Play
 
   private
 
+  def new_game(guess_total = 12, pegs = 4, breaker_user = 'human')
+    @game_board = GameBoard.new(guess_total, pegs)
+    @code_maker = CodeMaker.new(pegs)
+    @code_breaker = CodeBreaker.new(pegs, breaker_user)
+  end
+
   def game_loop
     loop do
       @game_board.update_board(@code_breaker.new_guess)
       @game_board.display
-      break if @game_board.winner? || @game_board.last_guess?
+      break if @game_board.breaker_wins? || @game_board.last_guess?
     end
     @game_board.display_secret_code
-    @game_board.winner? ? (puts win) : (puts lose)
+    @game_board.breaker_wins? ? (puts win) : (puts lose)
   end
 
   def win
@@ -267,7 +266,7 @@ class Play
   end
 
   def lose
-    ' Code Maker Wins! (You Lose)'
+    ' Code Maker Wins!'
   end
 end
 
