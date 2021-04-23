@@ -62,6 +62,44 @@ module Peg
   end
 end
 
+# Bunch of big ass logos
+module Logos
+  def mastermind_logo_alt
+    print "\n"
+    print "\n", '███╗░░░███╗░█████╗░░██████╗████████╗███████╗██████╗░███╗░░░███╗██╗███╗░░██╗██████╗░'
+    print "\n", '████╗░████║██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗░████║██║████╗░██║██╔══██╗'
+    print "\n", '██╔████╔██║███████║╚█████╗░░░░██║░░░█████╗░░██████╔╝██╔████╔██║██║██╔██╗██║██║░░██║'
+    print "\n", '██║╚██╔╝██║██╔══██║░╚═══██╗░░░██║░░░██╔══╝░░██╔══██╗██║╚██╔╝██║██║██║╚████║██║░░██║'
+    print "\n", '██║░╚═╝░██║██║░░██║██████╔╝░░░██║░░░███████╗██║░░██║██║░╚═╝░██║██║██║░╚███║██████╔╝'
+    print "\n", '╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░░░░╚═╝╚═╝╚═╝░░╚══╝╚═════╝░'
+    print "\n"
+  end
+
+  def mastermind_logo_epic
+    print "\n"
+    print "\n", ' _______  _______  _______ _________ _______  _______  _______ _________ _        ______  '
+    print "\n", '(       )(  ___  )(  ____ \\__   __/(  ____ \(  ____ )(       )\__   __/( (    /|(  __  \ '
+    print "\n", '| () () || (   ) || (    \/   ) (   | (    \/| (    )|| () () |   ) (   |  \  ( || (  \  )'
+    print "\n", '| || || || (___) || (_____    | |   | (__    | (____)|| || || |   | |   |   \ | || |   ) |'
+    print "\n", '| |(_)| ||  ___  |(_____  )   | |   |  __)   |     __)| |(_)| |   | |   | (\ \) || |   | |'
+    print "\n", '| |   | || (   ) |      ) |   | |   | (      | (\ (   | |   | |   | |   | | \   || |   ) |'
+    print "\n", '| )   ( || )   ( |/\____) |   | |   | (____/\| ) \ \__| )   ( |___) (___| )  \  || (__/  )'
+    print "\n", '|/     \||/     \|\_______)   )_(   (_______/|/   \__/|/     \|\_______/|/    )_)(______/ '
+    print "\n"
+  end
+
+  def mastermind_logo_big
+    print "\n"
+    print "\n", '  __  __           _____ _______ ______ _____  __  __ _____ _   _ _____  '
+    print "\n", ' |  \/  |   /\    / ____|__   __|  ____|  __ \|  \/  |_   _| \ | |  __ \ '
+    print "\n", ' | \  / |  /  \  | (___    | |  | |__  | |__) | \  / | | | |  \| | |  | |'
+    print "\n", ' | |\/| | / /\ \  \___ \   | |  |  __| |  _  /| |\/| | | | | . ` | |  | |'
+    print "\n", ' | |  | |/ ____ \ ____) |  | |  | |____| | \ \| |  | |_| |_| |\  | |__| |'
+    print "\n", ' |_|  |_/_/    \_\_____/   |_|  |______|_|  \_\_|  |_|_____|_| \_|_____/ '
+    print "\n"
+  end
+end
+
 # 6 Colors to choose from.
 class GameBoard
   include Peg
@@ -129,8 +167,8 @@ class GameBoard
 
   def display_board
     puts
-    @board.each_with_index do |row, index|
-      temp_i = index < 9 ? " #{index + 1}" : (index + 1).to_s
+    @board.each_with_index do |row, idx|
+      temp_i = idx < 9 ? " #{idx + 1}" : (idx + 1).to_s
       print "|   #{temp_i}    "
       row.each do |column|
         column.is_a?(Integer) ? (print "|    #{column}    ") : (print "|#{column}")
@@ -147,14 +185,14 @@ class GameBoard
     [first_pass[2], col]
   end
 
-  def match_remove(secret1, guess1, amount = 0, index = 0)
-    until secret1[index].nil?
-      if secret1[index] == guess1[index]
-        secret1.delete_at(index)
-        guess1.delete_at(index)
+  def match_remove(secret1, guess1, amount = 0, idx = 0)
+    until secret1[idx].nil?
+      if secret1[idx] == guess1[idx]
+        secret1.delete_at(idx)
+        guess1.delete_at(idx)
         amount += 1
       else
-        index += 1
+        idx += 1
       end
     end
     [secret1, guess1, amount]
@@ -174,7 +212,7 @@ class GameBoard
   end
 end
 
-# Parent class?
+# Parent class for human input?
 class CodeMaker
   include Peg
   attr_reader :maker_code
@@ -206,7 +244,7 @@ class CodeBreaker
 
   def new_guess
     guess_array = []
-    if @user == 'human'
+    if @user == 'breaker'
       @pegs.times { |ind| guess_array.push(peg_methods[user_selection(ind)]) }
     else
       @pegs.times { guess_array.push(peg_methods.sample) }
@@ -216,16 +254,16 @@ class CodeBreaker
 
   private
 
-  def user_selection(ind)
-    output_color_selection(ind)
+  def user_selection(idx)
+    output_color_selection(idx)
     peg_index
   end
 
-  def output_color_selection(ind)
-    peg_methods.each_index do |index|
-      print " #{peg_names[index]}(#{peg_initials[index]})"
+  def output_color_selection(peg_idx)
+    peg_methods.each_index do |idx|
+      print " #{peg_names[idx]}(#{peg_initials[idx]})"
     end
-    print " - Peg #{ind + 1}:"
+    print " - Peg #{peg_idx + 1}:"
   end
 
   def peg_index
@@ -236,22 +274,38 @@ end
 
 # Create this class to start program.
 class Play
+  include Logos
   def game
-    new_game(12, 4, 'human')
-    @game_board.secret_code = @code_maker.maker_code
-    @game_board.display
-    game_loop
+    main_menu
   end
 
   private
 
-  def new_game(guess_total = 12, pegs = 4, breaker_user = 'human')
+  def main_menu
+    # print "\n MASTERMIND!!!\n\n"
+    # mastermind_logo_big
+    # mastermind_logo_epic
+    mastermind_logo_alt
+    new_game
+  end
+
+  def new_game
+    print "\nDo you want to be 'Code Maker(1)' or 'Code Breaker(2)'?"
+    until (1..2).include?(select = gets.chomp.to_i); end
+    select = select == 1 ? 'maker' : 'breaker'
+    setup_game(12, 4, select)
+    game_loop
+  end
+
+  def setup_game(guess_total = 12, pegs = 4, breaker_user = 'breaker')
     @game_board = GameBoard.new(guess_total, pegs)
     @code_maker = CodeMaker.new(pegs)
     @code_breaker = CodeBreaker.new(pegs, breaker_user)
+    @game_board.secret_code = @code_maker.maker_code
   end
 
   def game_loop
+    @game_board.display
     loop do
       @game_board.update_board(@code_breaker.new_guess)
       @game_board.display
