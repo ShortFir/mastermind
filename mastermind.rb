@@ -142,9 +142,9 @@ class GameBoard
   end
 
   def display_secret_code
-    print "\n Code Was:"
+    print "\n  Secret: "
     @secret_code.each { |word| print "|#{word}" }
-    print "|\n\n"
+    print "|\n"
   end
 
   private
@@ -263,7 +263,7 @@ class CodeBreaker
     peg_methods.each_index do |idx|
       print " #{peg_names[idx]}(#{peg_initials[idx]})"
     end
-    print " - Peg #{peg_idx + 1}:"
+    print " - Peg #{peg_idx + 1}> "
   end
 
   def peg_index
@@ -281,19 +281,35 @@ class Play
 
   private
 
-  def main_menu
-    # print "\n MASTERMIND!!!\n\n"
+  def main_menu(select = 99)
+    # print "\n MASTERMIND!\n"
     # mastermind_logo_big
     # mastermind_logo_epic
     mastermind_logo_alt
-    new_game
+    until select == 3
+      # display_menu({ '1': 'New Game', '2': 'Rules', '3': 'Exit' })
+      display_menu(['New Game', 'Rules', 'Exit'])
+      until (1..3).include?(select = gets.chomp.to_i); end
+      case select
+      when 1 then new_game
+      when 2 then display_rules
+      when 3 then exit_game
+      end
+    end
   end
 
-  def new_game
-    print "\nDo you want to be 'Code Maker(1)' or 'Code Breaker(2)'?"
-    until (1..2).include?(select = gets.chomp.to_i); end
-    select = select == 1 ? 'maker' : 'breaker'
-    setup_game(12, 4, select)
+  def new_game(user = '')
+    print "\n", '  Do you want to make the code, break it, or go back?'
+    # display_menu({ '1': 'Code Maker', '2': 'Code Breaker', '3': 'Main Menu' })
+    display_menu(['Code Maker', 'Code Breaker', 'Main Menu'])
+    until (1..3).include?(select = gets.chomp.to_i); end
+    # select = select == 1 ? 'maker' : 'breaker'
+    case select
+    when 1 then user = 'maker'
+    when 2 then user = 'breaker'
+    when 3 then return
+    end
+    setup_game(12, 4, user)
     game_loop
   end
 
@@ -312,15 +328,37 @@ class Play
       break if @game_board.breaker_wins? || @game_board.last_guess?
     end
     @game_board.display_secret_code
-    @game_board.breaker_wins? ? (puts win) : (puts lose)
+    @game_board.breaker_wins? ? win : lose
+    pause_game
+  end
+
+  def display_menu(menu_array = [])
+    menu_array.each_with_index do |value, idx|
+      print "\n", "  (#{idx + 1}) #{value}"
+    end
+    print "\n", '  > '
+  end
+
+  def pause_game
+    print "\n", '  Press Enter To Continue...'
+    gets
+    puts
   end
 
   def win
-    ' Code Breaker Wins!'
+    print "\n", '  Code Breaker Wins!', "\n"
   end
 
   def lose
-    ' Code Maker Wins!'
+    print "\n", '  Code Maker Wins!', "\n"
+  end
+
+  def exit_game
+    print "\n", '  Good Bye!', "\n", "\n"
+  end
+
+  def display_rules
+    print "\n", '  Rules', "\n"
   end
 end
 
