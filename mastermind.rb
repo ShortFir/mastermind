@@ -100,9 +100,21 @@ module Logos
   end
 end
 
+# Appempts at computer solving.
+module Solver
+  def solution_set
+    set = {}
+    (1111..6666).each do |key|
+      set[key.to_s] = 'yes'
+    end
+    puts set
+  end
+end
+
 # 6 Colors to choose from.
 class GameBoard
   include Peg
+  include Solver
   attr_writer :secret_code
 
   def initialize(guess_total, pegs)
@@ -155,8 +167,8 @@ class GameBoard
   end
 
   def display_divider
-    print '-----------'
-    @board[0].length.times { print '----------' }
+    print '-----------' # 11
+    @board[0].length.times { print '----------' } # 10
   end
 
   def display_header
@@ -275,8 +287,10 @@ end
 # Create this class to start program.
 class Play
   include Logos
+  include Solver
   def game
-    main_menu
+    solution_set
+    # main_menu
   end
 
   private
@@ -303,7 +317,6 @@ class Play
     # display_menu({ '1': 'Code Maker', '2': 'Code Breaker', '3': 'Main Menu' })
     display_menu(['Code Maker', 'Code Breaker', 'Main Menu'])
     until (1..3).include?(select = gets.chomp.to_i); end
-    # select = select == 1 ? 'maker' : 'breaker'
     case select
     when 1 then user = 'maker'
     when 2 then user = 'breaker'
