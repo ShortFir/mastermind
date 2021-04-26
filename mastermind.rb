@@ -103,11 +103,29 @@ end
 # Appempts at computer solving.
 module Solver
   def solution_set
-    set = {}
-    (1111..6666).each do |key|
-      set[key.to_s] = 'yes'
+    set = []
+    # reg = /0[7-9]/
+    (1111..6666).each { |value| set.push(value) }
+    set = remove_combo(set, /[0789]/)
+    set = remove_combo(set, /[1]/)
+    set = remove_combo(set, /[2]/)
+    set = remove_combo(set, /[3]/)
+    set = remove_combo(set, /[4]/, false)
+    set = remove_combo(set, /[5]/, false)
+    set = remove_combo(set, /[6]/)
+    # set = remove_combo(set, /5{1}/, false)
+    p set
+    # puts "Solutions: #{set.length}"
+  end
+
+  def remove_combo(set, reg, match = true)
+    if match
+      set.delete_if { |value| value.to_s =~ reg }
+    else
+      set.delete_if { |value| value.to_s !~ reg }
     end
-    puts set
+    puts "Solutions: #{set.length}"
+    set
   end
 end
 
