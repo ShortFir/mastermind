@@ -100,32 +100,66 @@ module Logos
   end
 end
 
-# Appempts at computer solving.
+# Attempts at computer solving.
 module Solver
   def solution_set
     set = []
-    # reg = /0[7-9]/
+    @solutions = []
     (1111..6666).each { |value| set.push(value) }
-    set = remove_combo(set, /[0789]/)
-    set = remove_combo(set, /[1]/)
-    set = remove_combo(set, /[2]/)
-    set = remove_combo(set, /[3]/)
-    set = remove_combo(set, /[4]/, false)
-    set = remove_combo(set, /[5]/, false)
-    set = remove_combo(set, /[6]/)
-    # set = remove_combo(set, /5{1}/, false)
-    p set
-    # puts "Solutions: #{set.length}"
+    set = mod_set(set, /[0789]/)
+    set = mod_set(set, reg0(1))
+    set = mod_set(set, reg0(2))
+    set = mod_set(set, reg0(3))
+    set = mod_set(set, reg3(4), false)
+    set = mod_set(set, reg4(4))
+    set = mod_set(set, reg1(5), false)
+    set = mod_set(set, reg2(5))
+    p "Solutions: #{@solutions}"
+    p "Set:  #{set}"
   end
 
-  def remove_combo(set, reg, match = true)
-    if match
+  def mod_set(set, reg, delete = true)
+    if delete
       set.delete_if { |value| value.to_s =~ reg }
     else
       set.delete_if { |value| value.to_s !~ reg }
     end
-    puts "Solutions: #{set.length}"
+    @solutions.push(set.length)
     set
+  end
+
+  def reg0(num)
+    /#{num}/
+  end
+
+  def reg1(num)
+    /#{num}\d\d\d|\d#{num}\d\d|\d\d#{num}\d|\d\d\d#{num}/
+  end
+
+  def reg2(num)
+    # %r{
+    #   /#{num}#{num}\d\d|
+    #   #{num}\d\d#{num}|
+    #   \d\d#{num}#{num}|
+    #   \d#{num}#{num}\d|
+    #   \d#{num}\d#{num}|
+    #   #{num}\d#{num}\d/
+    # }x
+    /#{num}#{num}\d\d|\d\d#{num}#{num}|#{num}\d\d#{num}|\d#{num}#{num}\d|\d#{num}\d#{num}|#{num}\d#{num}\d/
+  end
+
+  def reg3(num)
+    # %r{
+    #   /#{num}#{num}#{num}\d|
+    #   #{num}#{num}\d#{num}|
+    #   #{num}\d#{num}#{num}|
+    #   \d#{num}#{num}#{num}/
+    # }x
+    /#{num}#{num}#{num}\d|#{num}#{num}\d#{num}|#{num}\d#{num}#{num}|\d#{num}#{num}#{num}/
+  end
+
+  def reg4(num)
+    /#{num}#{num}#{num}#{num}/
   end
 end
 
