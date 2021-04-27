@@ -104,29 +104,50 @@ end
 module Solver
   def create_set
     set = []
-    @solutions = []
     (1111..6666).each { |value| set.push(value) }
-    set = mod_set(set, /[0789]/)
-    set = mod_set(set, reg0(1))
-    set = mod_set(set, reg0(2))
-    set = mod_set(set, reg0(3))
-    set = mod_set(set, reg3(4), false)
-    set = mod_set(set, reg4(4))
-    set = mod_set(set, reg1(5), false)
-    set = mod_set(set, reg2(5))
-    # puts `clear`
-    # puts "\e[H\e[2J"
-    p "Solutions: #{@solutions}"
-    p "Set:  #{set}"
+    set = mod_set(set, /[0789]/, true)
   end
 
-  def mod_set(set, reg, delete = true)
+  def testing
+    set = create_set
+    solve(set, 1, [0, 0])
+    p set
+    until set.length == 1
+      sample, set = sample_set(set)
+      p sample, set
+    end
+  end
+
+  def sample_set(set)
+    sample = set.sample
+    set.delete(sample)
+    [sample, set]
+  end
+
+  def solve(set = [], num = 1, feedback = [0, 0])
+    case feedback.reduce(:+)
+    when 0 then set = mod_set(set, reg0(num), true)
+    when 1
+      set = mod_set(set, reg1(num), false)
+      set = mod_set(set, reg2(num), true)
+    when 2
+      set = mod_set(set, reg2(num), false)
+      set = mod_set(set, reg3(num), true)
+    when 3
+      set = mod_set(set, reg3(num), false)
+      set = mod_set(set, reg4(num), true)
+    # else return set # print 'ERROR!: solve thingy broken.'
+    end
+    set
+  end
+
+  def mod_set(set, reg, delete)
+    # deletes matches, or deletes non-matches
     if delete
       set.delete_if { |value| value.to_s =~ reg }
     else
       set.delete_if { |value| value.to_s !~ reg }
     end
-    @solutions.push(set.length)
     set
   end
 
@@ -168,8 +189,8 @@ end
 # 6 Colors to choose from.
 class GameBoard
   include Peg
-  # include Solver
   attr_writer :secret_code
+  attr_reader :feedback
 
   def initialize(guess_total, pegs)
     @current_guess = 0
@@ -178,14 +199,11 @@ class GameBoard
     @pegs = pegs
     @content = empty_peg # From Peg Module
     @board = create_board
+    @feedback = []
   end
 
   def display
-    # print "\n", display_divider, "\n"
     puts
-    display_divider
-    puts
-    # display_secret_code
     display_divider
     display_header
     display_divider
@@ -196,7 +214,8 @@ class GameBoard
 
   def update_board(code)
     @board[@current_guess] = code
-    @board[@current_guess].concat(position_color_match)
+    @feedback = position_color_match
+    @board[@current_guess].concat(@feedback)
     @current_guess += 1
   end
 
@@ -209,7 +228,7 @@ class GameBoard
   end
 
   def display_secret_code
-    print "\n  Secret: "
+    print "\n    Secret: "
     @secret_code.each { |word| print "|#{word}" }
     print "|\n"
   end
@@ -303,24 +322,67 @@ end
 # Maybe have these 2 methods have parent Player class?
 class CodeBreaker
   include Peg
+  include Solver
 
   def initialize(pegs, user)
     @pegs = pegs
     @user = user
+    return unless @user == 'computer'
+
+    @set = create_set
+    @guess_set = [1, 2, 3, 4, 5, 6]
+    @sample = 0
+    @total = 0
   end
 
-  def new_guess
+  def new_guess(feedback = [])
     guess_array = []
-    if @user == 'breaker'
+    case @user
+    when 'human'
       @pegs.times { |ind| guess_array.push(peg_methods[user_selection(ind)]) }
-    else
-      # calls solver
-      @pegs.times { guess_array.push(peg_methods.sample) }
+    when 'computer'
+      guess_array = computer_solve(feedback)
+      # @pegs.times { guess_array.push(peg_methods.sample) }
     end
     guess_array
   end
 
   private
+
+  def computer_solve(feedback, guess = [])
+    @total += feedback.reduce(:+) if feedback != []
+    @total >= 4 ? comp_solve_total4 : comp_solve_else(feedback, guess)
+  end
+
+  def comp_solve_total4
+    until @guess_set == []
+      sample_guess
+      @set = solve(@set, @sample)
+    end
+    print "Solution Set: #{@set}"
+    sample, @set = sample_set(@set)
+    convert_guess(sample.to_s.split(''))
+  end
+
+  def comp_solve_else(feedback, guess)
+    @set = solve(@set, @sample, feedback) if feedback != []
+    sample_guess
+    @pegs.times { guess.push(@sample) }
+    convert_guess(guess)
+  end
+
+  def sample_guess
+    @sample = @guess_set.sample
+    @guess_set.delete(@sample)
+  end
+
+  def convert_guess(guess)
+    array = []
+    guess.each do |value|
+      array.push(peg_methods[value.to_i - 1])
+    end
+    array
+  end
 
   def user_selection(idx)
     output_color_selection(idx)
@@ -344,9 +406,7 @@ end
 # Create this class to start program.
 class Play
   include Logos
-  include Solver
   def game
-    # create_set
     main_menu
   end
 
@@ -370,12 +430,12 @@ class Play
     new_game2
     until (1..3).include?(select = gets.chomp.to_i); end
     case select
-    when 1 then user = 'maker'
-    when 2 then user = 'breaker'
+    when 1 then user = 'computer'
+    when 2 then user = 'human'
     when 3 then return
     end
     setup_game(12, 4, user)
-    game_loop_start
+    game_loop_start(user)
   end
 
   def new_game2
@@ -383,28 +443,31 @@ class Play
     display_menu(['Code Maker', 'Code Breaker', 'Main Menu'])
   end
 
-  def setup_game(guess_total = 12, pegs = 4, breaker_user = 'breaker')
+  def setup_game(guess_total = 12, pegs = 4, breaker_user = 'human')
     @game_board = GameBoard.new(guess_total, pegs)
     @code_maker = CodeMaker.new(pegs)
-    @code_breaker = CodeBreaker.new(pegs, breaker_user)
     @game_board.secret_code = @code_maker.maker_code
+    @code_breaker = CodeBreaker.new(pegs, breaker_user)
   end
 
-  def game_loop_start
+  def game_loop_start(user)
     new_screen
     @game_board.display
-    game_loop
+    game_loop(user)
     @game_board.display_secret_code
     @game_board.breaker_wins? ? win : lose
     pause_game
   end
 
-  def game_loop
+  def game_loop(user)
     loop do
-      @game_board.update_board(@code_breaker.new_guess)
+      @game_board.update_board(@code_breaker.new_guess(@game_board.feedback))
       new_screen
+      # print @game_board.feedback
       @game_board.display
       break if @game_board.breaker_wins? || @game_board.last_guess?
+
+      pause_game if user == 'computer'
     end
   end
 
