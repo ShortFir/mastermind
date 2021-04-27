@@ -66,43 +66,43 @@ end
 module Logos
   def mastermind_logo_alt
     print "\n"
-    print "\n", '███╗░░░███╗░█████╗░░██████╗████████╗███████╗██████╗░███╗░░░███╗██╗███╗░░██╗██████╗░'
-    print "\n", '████╗░████║██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗░████║██║████╗░██║██╔══██╗'
-    print "\n", '██╔████╔██║███████║╚█████╗░░░░██║░░░█████╗░░██████╔╝██╔████╔██║██║██╔██╗██║██║░░██║'
-    print "\n", '██║╚██╔╝██║██╔══██║░╚═══██╗░░░██║░░░██╔══╝░░██╔══██╗██║╚██╔╝██║██║██║╚████║██║░░██║'
-    print "\n", '██║░╚═╝░██║██║░░██║██████╔╝░░░██║░░░███████╗██║░░██║██║░╚═╝░██║██║██║░╚███║██████╔╝'
-    print "\n", '╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░░░░╚═╝╚═╝╚═╝░░╚══╝╚═════╝░'
+    print "\n", '  ███╗░░░███╗░█████╗░░██████╗████████╗███████╗██████╗░███╗░░░███╗██╗███╗░░██╗██████╗░'
+    print "\n", '  ████╗░████║██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗░████║██║████╗░██║██╔══██╗'
+    print "\n", '  ██╔████╔██║███████║╚█████╗░░░░██║░░░█████╗░░██████╔╝██╔████╔██║██║██╔██╗██║██║░░██║'
+    print "\n", '  ██║╚██╔╝██║██╔══██║░╚═══██╗░░░██║░░░██╔══╝░░██╔══██╗██║╚██╔╝██║██║██║╚████║██║░░██║'
+    print "\n", '  ██║░╚═╝░██║██║░░██║██████╔╝░░░██║░░░███████╗██║░░██║██║░╚═╝░██║██║██║░╚███║██████╔╝'
+    print "\n", '  ╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░░░░╚═╝╚═╝╚═╝░░╚══╝╚═════╝░'
     print "\n"
   end
 
   def mastermind_logo_epic
     print "\n"
-    print "\n", ' _______  _______  _______ _________ _______  _______  _______ _________ _        ______  '
-    print "\n", '(       )(  ___  )(  ____ \\__   __/(  ____ \(  ____ )(       )\__   __/( (    /|(  __  \ '
-    print "\n", '| () () || (   ) || (    \/   ) (   | (    \/| (    )|| () () |   ) (   |  \  ( || (  \  )'
-    print "\n", '| || || || (___) || (_____    | |   | (__    | (____)|| || || |   | |   |   \ | || |   ) |'
-    print "\n", '| |(_)| ||  ___  |(_____  )   | |   |  __)   |     __)| |(_)| |   | |   | (\ \) || |   | |'
-    print "\n", '| |   | || (   ) |      ) |   | |   | (      | (\ (   | |   | |   | |   | | \   || |   ) |'
-    print "\n", '| )   ( || )   ( |/\____) |   | |   | (____/\| ) \ \__| )   ( |___) (___| )  \  || (__/  )'
-    print "\n", '|/     \||/     \|\_______)   )_(   (_______/|/   \__/|/     \|\_______/|/    )_)(______/ '
+    print "\n", '   _______  _______  _______ _________ _______  _______  _______ _________ _        ______  '
+    print "\n", '  (       )(  ___  )(  ____ \\__   __/(  ____ \(  ____ )(       )\__   __/( (    /|(  __  \ '
+    print "\n", '  | () () || (   ) || (    \/   ) (   | (    \/| (    )|| () () |   ) (   |  \  ( || (  \  )'
+    print "\n", '  | || || || (___) || (_____    | |   | (__    | (____)|| || || |   | |   |   \ | || |   ) |'
+    print "\n", '  | |(_)| ||  ___  |(_____  )   | |   |  __)   |     __)| |(_)| |   | |   | (\ \) || |   | |'
+    print "\n", '  | |   | || (   ) |      ) |   | |   | (      | (\ (   | |   | |   | |   | | \   || |   ) |'
+    print "\n", '  | )   ( || )   ( |/\____) |   | |   | (____/\| ) \ \__| )   ( |___) (___| )  \  || (__/  )'
+    print "\n", '  |/     \||/     \|\_______)   )_(   (_______/|/   \__/|/     \|\_______/|/    )_)(______/ '
     print "\n"
   end
 
   def mastermind_logo_big
     print "\n"
-    print "\n", '  __  __           _____ _______ ______ _____  __  __ _____ _   _ _____  '
-    print "\n", ' |  \/  |   /\    / ____|__   __|  ____|  __ \|  \/  |_   _| \ | |  __ \ '
-    print "\n", ' | \  / |  /  \  | (___    | |  | |__  | |__) | \  / | | | |  \| | |  | |'
-    print "\n", ' | |\/| | / /\ \  \___ \   | |  |  __| |  _  /| |\/| | | | | . ` | |  | |'
-    print "\n", ' | |  | |/ ____ \ ____) |  | |  | |____| | \ \| |  | |_| |_| |\  | |__| |'
-    print "\n", ' |_|  |_/_/    \_\_____/   |_|  |______|_|  \_\_|  |_|_____|_| \_|_____/ '
+    print "\n", '   __  __           _____ _______ ______ _____  __  __ _____ _   _ _____  '
+    print "\n", '  |  \/  |   /\    / ____|__   __|  ____|  __ \|  \/  |_   _| \ | |  __ \ '
+    print "\n", '  | \  / |  /  \  | (___    | |  | |__  | |__) | \  / | | | |  \| | |  | |'
+    print "\n", '  | |\/| | / /\ \  \___ \   | |  |  __| |  _  /| |\/| | | | | . ` | |  | |'
+    print "\n", '  | |  | |/ ____ \ ____) |  | |  | |____| | \ \| |  | |_| |_| |\  | |__| |'
+    print "\n", '  |_|  |_/_/    \_\_____/   |_|  |______|_|  \_\_|  |_|_____|_| \_|_____/ '
     print "\n"
   end
 end
 
 # Attempts at computer solving.
 module Solver
-  def solution_set
+  def create_set
     set = []
     @solutions = []
     (1111..6666).each { |value| set.push(value) }
@@ -114,6 +114,8 @@ module Solver
     set = mod_set(set, reg4(4))
     set = mod_set(set, reg1(5), false)
     set = mod_set(set, reg2(5))
+    # puts `clear`
+    # puts "\e[H\e[2J"
     p "Solutions: #{@solutions}"
     p "Set:  #{set}"
   end
@@ -166,7 +168,7 @@ end
 # 6 Colors to choose from.
 class GameBoard
   include Peg
-  include Solver
+  # include Solver
   attr_writer :secret_code
 
   def initialize(guess_total, pegs)
@@ -179,6 +181,7 @@ class GameBoard
   end
 
   def display
+    # print "\n", display_divider, "\n"
     puts
     display_divider
     puts
@@ -219,12 +222,12 @@ class GameBoard
   end
 
   def display_divider
-    print '-----------' # 11
+    print '  -----------' # 11 + 2 space
     @board[0].length.times { print '----------' } # 10
   end
 
   def display_header
-    print "\n|  Guess  "
+    print "\n  |  Guess  "
     (@board[0].length - 2).times { |idx| print "|  Peg #{idx + 1}  " }
     print "| Col&Pos |  Color  |\n"
   end
@@ -233,7 +236,7 @@ class GameBoard
     puts
     @board.each_with_index do |row, idx|
       temp_i = idx < 9 ? " #{idx + 1}" : (idx + 1).to_s
-      print "|   #{temp_i}    "
+      print "  |   #{temp_i}    "
       row.each do |column|
         column.is_a?(Integer) ? (print "|    #{column}    ") : (print "|#{column}")
       end
@@ -311,6 +314,7 @@ class CodeBreaker
     if @user == 'breaker'
       @pegs.times { |ind| guess_array.push(peg_methods[user_selection(ind)]) }
     else
+      # calls solver
       @pegs.times { guess_array.push(peg_methods.sample) }
     end
     guess_array
@@ -324,6 +328,7 @@ class CodeBreaker
   end
 
   def output_color_selection(peg_idx)
+    print '   '
     peg_methods.each_index do |idx|
       print " #{peg_names[idx]}(#{peg_initials[idx]})"
     end
@@ -341,19 +346,15 @@ class Play
   include Logos
   include Solver
   def game
-    solution_set
-    # main_menu
+    # create_set
+    main_menu
   end
 
   private
 
   def main_menu(select = 99)
-    # print "\n MASTERMIND!\n"
-    # mastermind_logo_big
-    # mastermind_logo_epic
-    mastermind_logo_alt
     until select == 3
-      # display_menu({ '1': 'New Game', '2': 'Rules', '3': 'Exit' })
+      new_screen
       display_menu(['New Game', 'Rules', 'Exit'])
       until (1..3).include?(select = gets.chomp.to_i); end
       case select
@@ -365,9 +366,8 @@ class Play
   end
 
   def new_game(user = '')
-    print "\n", '  Do you want to make the code, break it, or go back?'
-    # display_menu({ '1': 'Code Maker', '2': 'Code Breaker', '3': 'Main Menu' })
-    display_menu(['Code Maker', 'Code Breaker', 'Main Menu'])
+    new_screen
+    new_game2
     until (1..3).include?(select = gets.chomp.to_i); end
     case select
     when 1 then user = 'maker'
@@ -375,7 +375,12 @@ class Play
     when 3 then return
     end
     setup_game(12, 4, user)
-    game_loop
+    game_loop_start
+  end
+
+  def new_game2
+    print "\n", '  Do you want to make the code, break it, or go back?'
+    display_menu(['Code Maker', 'Code Breaker', 'Main Menu'])
   end
 
   def setup_game(guess_total = 12, pegs = 4, breaker_user = 'breaker')
@@ -385,16 +390,29 @@ class Play
     @game_board.secret_code = @code_maker.maker_code
   end
 
-  def game_loop
+  def game_loop_start
+    new_screen
     @game_board.display
-    loop do
-      @game_board.update_board(@code_breaker.new_guess)
-      @game_board.display
-      break if @game_board.breaker_wins? || @game_board.last_guess?
-    end
+    game_loop
     @game_board.display_secret_code
     @game_board.breaker_wins? ? win : lose
     pause_game
+  end
+
+  def game_loop
+    loop do
+      @game_board.update_board(@code_breaker.new_guess)
+      new_screen
+      @game_board.display
+      break if @game_board.breaker_wins? || @game_board.last_guess?
+    end
+  end
+
+  def new_screen
+    print "\e[H\e[2J" # Moves down to new screen
+    # mastermind_logo_big
+    # mastermind_logo_epic
+    mastermind_logo_alt
   end
 
   def display_menu(menu_array = [])
@@ -419,11 +437,13 @@ class Play
   end
 
   def exit_game
-    print "\n", '  Good Bye!', "\n", "\n"
+    print "\e[H\e[2J", "\n", '  Good Bye!', "\n", "\n"
   end
 
   def display_rules
+    new_screen
     print "\n", '  Rules', "\n"
+    pause_game
   end
 end
 
