@@ -139,8 +139,8 @@ module Rules
     print nls, 'The -Code Breaker- then guesses the secret code.'
     print nls, 'They get, by default, 12 guesses.'
     print nls, 'After each guess, feedback is provided on the right side of the board.'
-    print nls, '- Color & position is correct for a peg.'
-    print nls, '- Color is correct, but the peg is in the wrong position.'
+    print nls, 'Second last column - Color & position is correct for a peg.'
+    print nls, 'Last column - Color is correct, but the peg is in the wrong position.'
     rules_div
   end
 
@@ -357,14 +357,42 @@ class GameBoard
   end
 end
 
+# Include this in the Code class's
+module HumanInput
+  def user_selection(idx)
+    output_color_selection(idx)
+    peg_index
+  end
+
+  def output_color_selection(peg_idx)
+    print '   '
+    peg_methods.each_index do |idx|
+      print " #{peg_names[idx]}(#{peg_initials[idx]})"
+    end
+    print " - Peg #{peg_idx + 1}> "
+  end
+
+  def peg_index
+    until peg_initials.any?(selection = gets.chomp); end
+    peg_initials.index(selection)
+  end
+end
+
 # Parent class for human input?
 class CodeMaker
   include Peg
+  include HumanInput
   attr_reader :maker_code
 
-  def initialize(pegs)
+  def initialize(pegs, user)
     @pegs = pegs
-    @maker_code = random_code
+    if user == 'computer'
+      guess_array = []
+      @pegs.times { |ind| guess_array.push(peg_methods[user_selection(ind)]) }
+      @maker_code = guess_array
+    else
+      @maker_code = random_code
+    end
   end
 
   private
@@ -381,6 +409,7 @@ end
 # Maybe have these 2 methods have parent Player class?
 class CodeBreaker
   include Peg
+  include HumanInput
   include Solver
 
   def initialize(pegs, user)
@@ -408,6 +437,7 @@ class CodeBreaker
 
   private
 
+  # Solving moved to module?
   def computer_solve(feedback, guess = [])
     @total += feedback.reduce(:+) if feedback != []
     @total >= 4 ? comp_solve_total4 : comp_solve_else(feedback, guess)
@@ -443,23 +473,25 @@ class CodeBreaker
     array
   end
 
-  def user_selection(idx)
-    output_color_selection(idx)
-    peg_index
-  end
+  # Above is solving stuff.
+  #
+  # def user_selection(idx)
+  #   output_color_selection(idx)
+  #   peg_index
+  # end
 
-  def output_color_selection(peg_idx)
-    print '   '
-    peg_methods.each_index do |idx|
-      print " #{peg_names[idx]}(#{peg_initials[idx]})"
-    end
-    print " - Peg #{peg_idx + 1}> "
-  end
+  # def output_color_selection(peg_idx)
+  #   print '   '
+  #   peg_methods.each_index do |idx|
+  #     print " #{peg_names[idx]}(#{peg_initials[idx]})"
+  #   end
+  #   print " - Peg #{peg_idx + 1}> "
+  # end
 
-  def peg_index
-    until peg_initials.any?(selection = gets.chomp); end
-    peg_initials.index(selection)
-  end
+  # def peg_index
+  #   until peg_initials.any?(selection = gets.chomp); end
+  #   peg_initials.index(selection)
+  # end
 end
 
 # Create this class to start program.
@@ -499,15 +531,15 @@ class Play
   end
 
   def new_game2
-    print "\n", '  Do you want to make the code, break it, or go back?'
+    print nls, 'Do you want to make the code, break it, or go back?'
     display_menu(['Code Maker', 'Code Breaker', 'Main Menu'])
   end
 
-  def setup_game(guess_total = 12, pegs = 4, breaker_user = 'human')
+  def setup_game(guess_total = 12, pegs = 4, user = 'human')
     @game_board = GameBoard.new(guess_total, pegs)
-    @code_maker = CodeMaker.new(pegs)
+    @code_maker = CodeMaker.new(pegs, user)
     @game_board.secret_code = @code_maker.maker_code
-    @code_breaker = CodeBreaker.new(pegs, breaker_user)
+    @code_breaker = CodeBreaker.new(pegs, user)
   end
 
   def game_loop_start(user)
@@ -540,27 +572,27 @@ class Play
 
   def display_menu(menu_array = [])
     menu_array.each_with_index do |value, idx|
-      print "\n", "  (#{idx + 1}) #{value}"
+      print nls, "(#{idx + 1}) #{value}"
     end
-    print "\n", '  > '
+    print nls, '> '
   end
 
   def pause_game
-    print "\n", '  Press Enter To Continue...'
+    print nls, 'Press Enter To Continue...'
     gets
     puts
   end
 
   def win
-    print "\n", '  Code Breaker Wins!', "\n"
+    print nls, 'Code Breaker Wins!', "\n"
   end
 
   def lose
-    print "\n", '  Code Maker Wins!', "\n"
+    print nls, 'Code Maker Wins!', "\n"
   end
 
   def exit_game
-    print "\e[H\e[2J", "\n", '  Good Bye!', "\n", "\n"
+    print "\e[H\e[2J", nls, 'Good Bye!', "\n", "\n"
   end
 end
 
