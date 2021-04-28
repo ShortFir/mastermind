@@ -365,7 +365,7 @@ module HumanInput
   end
 
   def output_color_selection(peg_idx)
-    print '   '
+    print ' '
     peg_methods.each_index do |idx|
       print " #{peg_names[idx]}(#{peg_initials[idx]})"
     end
@@ -386,16 +386,18 @@ class CodeMaker
 
   def initialize(pegs, user)
     @pegs = pegs
-    if user == 'computer'
-      guess_array = []
-      @pegs.times { |ind| guess_array.push(peg_methods[user_selection(ind)]) }
-      @maker_code = guess_array
-    else
-      @maker_code = random_code
-    end
+    @maker_code = user == 'computer' ? user_code : random_code
   end
 
   private
+
+  def user_code
+    print "\n  ", '-Code Maker-, please enter color code.'
+    print "\n  ", '4 colors total, repeat colors allowed.', "\n", "\n"
+    array = []
+    @pegs.times { |idx| array.push(peg_methods[user_selection(idx)]) }
+    array
+  end
 
   def random_code
     # 'peg_methods.sample(@pegs)' works, except each element is unique.
@@ -427,7 +429,7 @@ class CodeBreaker
     guess_array = []
     case @user
     when 'human'
-      @pegs.times { |ind| guess_array.push(peg_methods[user_selection(ind)]) }
+      @pegs.times { |idx| guess_array.push(peg_methods[user_selection(idx)]) }
     when 'computer'
       guess_array = computer_solve(feedback)
       # @pegs.times { guess_array.push(peg_methods.sample) }
@@ -536,6 +538,7 @@ class Play
   end
 
   def setup_game(guess_total = 12, pegs = 4, user = 'human')
+    new_screen
     @game_board = GameBoard.new(guess_total, pegs)
     @code_maker = CodeMaker.new(pegs, user)
     @game_board.secret_code = @code_maker.maker_code
