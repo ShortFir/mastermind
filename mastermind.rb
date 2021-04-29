@@ -64,6 +64,8 @@ end
 
 # Bunch of big ass logos
 module Logos
+  private
+
   def mastermind_logo_alt
     print "\n"
     print "\n", '  ███╗░░░███╗░█████╗░░██████╗████████╗███████╗██████╗░███╗░░░███╗██╗███╗░░██╗██████╗░'
@@ -102,6 +104,8 @@ end
 
 # It's the Rules module
 module Rules
+  private
+
   def display_rules
     new_screen
     rules_title
@@ -118,7 +122,7 @@ module Rules
   end
 
   def rules_title
-    print nls, 'Rules'
+    print nls, 'How To Play'
     rules_div
   end
 
@@ -159,8 +163,31 @@ module Rules
   end
 end
 
+# Rubocop
+module MenuStuff
+  def pause_game
+    print nls, 'Press Enter To Continue...'
+    gets
+    puts
+  end
+
+  def win
+    print nls, 'Code Breaker Wins!', "\n"
+  end
+
+  def lose
+    print nls, 'Code Maker Wins!', "\n"
+  end
+
+  def exit_game
+    print "\e[H\e[2J", nls, 'Good Bye!', "\n", "\n"
+  end
+end
+
 # Attempts at computer solving.
 module Solver
+  private
+
   def create_set
     set = []
     (1111..6666).each { |value| set.push(value) }
@@ -195,7 +222,6 @@ module Solver
     when 3
       set = mod_set(set, reg3(num), false)
       set = mod_set(set, reg4(num), true)
-    # else return set # print 'ERROR!: solve thingy broken.'
     end
     set
   end
@@ -442,10 +468,10 @@ class CodeBreaker
   # Solving moved to module?
   def computer_solve(feedback, guess = [])
     @total += feedback.reduce(:+) if feedback != []
-    @total >= 4 ? comp_solve_total4 : comp_solve_else(feedback, guess)
+    @total >= @pegs ? comp_solve_max_pegs : comp_solve_else(feedback, guess)
   end
 
-  def comp_solve_total4
+  def comp_solve_max_pegs
     until @guess_set == []
       sample_guess
       @set = solve(@set, @sample)
@@ -474,32 +500,13 @@ class CodeBreaker
     end
     array
   end
-
-  # Above is solving stuff.
-  #
-  # def user_selection(idx)
-  #   output_color_selection(idx)
-  #   peg_index
-  # end
-
-  # def output_color_selection(peg_idx)
-  #   print '   '
-  #   peg_methods.each_index do |idx|
-  #     print " #{peg_names[idx]}(#{peg_initials[idx]})"
-  #   end
-  #   print " - Peg #{peg_idx + 1}> "
-  # end
-
-  # def peg_index
-  #   until peg_initials.any?(selection = gets.chomp); end
-  #   peg_initials.index(selection)
-  # end
 end
 
 # Create this class to start program.
 class Play
   include Logos
   include Rules
+  include MenuStuff
   def game
     main_menu
   end
@@ -509,7 +516,7 @@ class Play
   def main_menu(select = 99)
     until select == 3
       new_screen
-      display_menu(['New Game', 'Rules', 'Exit'])
+      display_menu(['New Game', 'How To Play', 'Exit'])
       until (1..3).include?(select = gets.chomp.to_i); end
       case select
       when 1 then new_game
@@ -519,25 +526,46 @@ class Play
     end
   end
 
-  def new_game(user = '')
-    new_screen
-    new_game2
-    until (1..3).include?(select = gets.chomp.to_i); end
-    case select
-    when 1 then user = 'computer'
-    when 2 then user = 'human'
-    when 3 then return
+  def new_game(guess_total = 12, pegs = 4, user = 'human', stay = true)
+    while stay
+      new_game2(guess_total, pegs)
+      until (1..4).include?(select = gets.chomp.to_i); end
+      case select
+      when 1
+        user = 'computer'
+        pegs = 4
+        stay = false
+      when 2
+        user = 'human'
+        stay = false
+      when 3 then guess_total, pegs = rule_change
+      when 4 then return
+      end
     end
-    setup_game(12, 4, user)
+    setup_game(guess_total, pegs, user)
     game_loop_start(user)
   end
 
-  def new_game2
-    print nls, 'Do you want to make the code, break it, or go back?'
-    display_menu(['Code Maker', 'Code Breaker', 'Main Menu'])
+  def new_game2(guess_total, pegs)
+    new_screen
+    # print nls, 'Do you want to make the code, break it, or go back?'
+    print nls, "Current Rules: Guesses - #{guess_total} | Code Pegs - #{pegs}", "\n"
+    display_menu(['Code Maker (Always 4 peg code)', 'Code Breaker', 'Change Rules', 'Main Menu'])
   end
 
-  def setup_game(guess_total = 12, pegs = 4, user = 'human')
+  def rule_change(total = 0)
+    new_screen
+    print nls, 'How many guesses in total: (2 - 20) (Default 12)? '
+    loop do
+      total = gets.chomp.to_i
+      break if (2..20).include?(total) && (total % 2).zero?
+    end
+    print nls, 'How many pegs for secret code: (1 - 6) (Default 4)? '
+    until (1..6).include?(peg = gets.chomp.to_i); end
+    [total, peg]
+  end
+
+  def setup_game(guess_total, pegs, user)
     new_screen
     @game_board = GameBoard.new(guess_total, pegs)
     @code_maker = CodeMaker.new(pegs, user)
@@ -578,24 +606,6 @@ class Play
       print nls, "(#{idx + 1}) #{value}"
     end
     print nls, '> '
-  end
-
-  def pause_game
-    print nls, 'Press Enter To Continue...'
-    gets
-    puts
-  end
-
-  def win
-    print nls, 'Code Breaker Wins!', "\n"
-  end
-
-  def lose
-    print nls, 'Code Maker Wins!', "\n"
-  end
-
-  def exit_game
-    print "\e[H\e[2J", nls, 'Good Bye!', "\n", "\n"
   end
 end
 
