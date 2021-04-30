@@ -7,53 +7,53 @@ class Play
   include MenuFormat
   def game
     main_menu
+    exit_game
   end
 
   private
 
-  def main_menu(select = 99)
-    until select == 3
+  def main_menu
+    loop do
       new_screen
       display_menu(['New Game', 'How To Play', 'Exit'])
-      until (1..3).include?(select = gets.chomp.to_i); end
-      case select
-      when 1 then new_game
+      case await_input((1..3))
+      when 1 then new_game_menu
       when 2 then display_rules
-      when 3 then exit_game
+      when 3 then return
       end
     end
   end
 
-  def new_game(guess_total = 12, pegs = 4, user = 'human', stay = true)
-    while stay
+  def new_game_menu(guess_total = 12, pegs = 4)
+    loop do
       new_game2(guess_total, pegs)
-      until (1..4).include?(select = gets.chomp.to_i); end
-      case select
-      when 1
-        user = 'computer'
-        pegs = 4
-        stay = false
-      when 2
-        user = 'human'
-        stay = false
+      case await_input((1..4))
+      when 1 then setup_game(guess_total, 4, 'computer'); break
+      when 2 then setup_game(guess_total, pegs, 'human'); break
       when 3 then guess_total, pegs = rule_change
       when 4 then return
       end
     end
-    setup_game(guess_total, pegs, user)
-    game_loop_start(user)
+    game_loop_start
   end
 
   def new_game2(guess_total, pegs)
     new_screen
-    # print nls, 'Do you want to make the code, break it, or go back?'
     print nls, "Current Rules: Guesses - #{guess_total} | Code Pegs - #{pegs}", "\n"
     display_menu(['Code Maker (Always 4 peg code)', 'Code Breaker', 'Change Rules', 'Main Menu'])
   end
 
+  def setup_game(guess_total, pegs, user)
+    new_screen
+    @game_board = GameBoard.new(guess_total, pegs)
+    @code_maker = CodeMaker.new(pegs, user)
+    @game_board.secret_code = @code_maker.maker_code
+    @code_breaker = user == 'human' ? Human.new(pegs) : Computer.new(pegs)
+  end
+
   def rule_change(total = 0)
     new_screen
-    print nls, 'How many guesses in total: (Even No. 2 - 20) (Default 12)? '
+    print nls, 'How many guesses in total: (Even number from 2 - 20) (Default 12)? '
     loop do
       total = gets.chomp.to_i
       break if (2..20).include?(total) && (total % 2).zero?
@@ -63,39 +63,33 @@ class Play
     [total, peg]
   end
 
-  def setup_game(guess_total, pegs, user)
-    new_screen
-    @game_board = GameBoard.new(guess_total, pegs)
-    @code_maker = CodeMaker.new(pegs, user)
-    @game_board.secret_code = @code_maker.maker_code
-    @code_breaker = CodeBreaker.new(pegs, user)
-  end
-
-  def game_loop_start(user)
+  def game_loop_start
     new_screen
     @game_board.display
-    game_loop(user)
+    game_loop
     @game_board.display_secret_code
     @game_board.breaker_wins? ? win : lose
     pause_game
   end
 
-  def game_loop(user)
+  def game_loop
     loop do
       @game_board.update_board(@code_breaker.new_guess(@game_board.feedback))
       new_screen
-      # print @game_board.feedback
       @game_board.display
       break if @game_board.breaker_wins? || @game_board.last_guess?
 
-      pause_game if user == 'computer'
+      pause_game if @code_breaker.user == 'computer'
     end
+  end
+
+  def await_input(range)
+    until range.include?(select = gets.chomp.to_i); end
+    select
   end
 
   def new_screen
     print "\e[H\e[2J" # Moves down to new screen
-    # print mastermind_logo_big
-    # print mastermind_logo_epic
     print mastermind_logo_alt
   end
 

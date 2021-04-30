@@ -81,9 +81,9 @@ class GameBoard
   def position_color_match
     secret = Array.new(@secret_code) # Otherwise it passes the reference???
     current = Array.new(@board[@current_guess])
-    first_pass = match_remove(secret, current)
-    col = match_any(first_pass[0], first_pass[1])
-    [first_pass[2], col]
+    secret2, guess2, pos_and_col = match_remove(secret, current)
+    col = match_any(secret2, guess2)
+    [pos_and_col, col]
   end
 
   def match_remove(secret1, guess1, amount = 0, idx = 0)

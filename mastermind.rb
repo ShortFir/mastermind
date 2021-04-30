@@ -9,6 +9,8 @@ require_relative 'solver'
 require_relative 'gameboard'
 require_relative 'codemaker'
 require_relative 'codebreaker'
+require_relative 'human'
+require_relative 'computer'
 require_relative 'play'
 
 Play.new.game
