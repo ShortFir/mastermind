@@ -108,17 +108,47 @@ module Rules
 
   def display_rules
     new_screen
-    rules_title
-    rules_step1
-    rules_step2
-    rules_step3
-    rules_step_end
+    print rules_full
+    # rules_title
+    # rules_step1
+    # rules_step2
+    # rules_step3
+    # rules_step_end
     pause_game
   end
 
   def nls
     # newline, spaces
     "\n  "
+  end
+
+  def rules_full
+    <<~HEREDOC
+      .
+        How To Play
+        ------------------------------------------------------------
+        Step 1:
+        The -Code Maker- enters a code.
+        The code is 4 colored pegs, made from a choice of 6 different colors.
+        Repeated colors are allowed.
+        ------------------------------------------------------------
+        Step 2:
+        The -Code Breaker- then guesses the secret code.
+        They get, by default, 12 guesses.
+        After each guess, feedback is provided on the right side of the board.
+        Second last column - Color & position is correct for a peg.
+        Last column - Color is correct, but the peg is in the wrong position.
+        ------------------------------------------------------------
+        Step 3:
+        Have fun crushing your enemies...at Mastermind!
+        ------------------------------------------------------------
+        If further information is need, consult your local search engine.
+        Additionally, copy/follow this link to Wikipedia.
+        https://en.wikipedia.org/wiki/Mastermind_(board_game)
+        ------------------------------------------------------------
+        Happy Gaming
+      .
+    HEREDOC
   end
 
   def rules_title
@@ -165,6 +195,8 @@ end
 
 # Rubocop
 module MenuStuff
+  private
+
   def pause_game
     print nls, 'Press Enter To Continue...'
     gets
@@ -495,9 +527,7 @@ class CodeBreaker
 
   def convert_guess(guess)
     array = []
-    guess.each do |value|
-      array.push(peg_methods[value.to_i - 1])
-    end
+    guess.each { |value| array.push(peg_methods[value.to_i - 1]) }
     array
   end
 end
@@ -555,7 +585,7 @@ class Play
 
   def rule_change(total = 0)
     new_screen
-    print nls, 'How many guesses in total: (2 - 20) (Default 12)? '
+    print nls, 'How many guesses in total: (Even No. 2 - 20) (Default 12)? '
     loop do
       total = gets.chomp.to_i
       break if (2..20).include?(total) && (total % 2).zero?
