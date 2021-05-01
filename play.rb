@@ -43,6 +43,15 @@ class Play
     display_menu(['Code Maker (Always 4 peg code)', 'Code Breaker', 'Change Rules', 'Main Menu'])
   end
 
+  # def new_game_case(guess_total, pegs)
+  #   case await_input((1..4))
+  #   when 1 then setup_game(guess_total, 4, 'computer'); break
+  #   when 2 then setup_game(guess_total, pegs, 'human'); break
+  #   when 3 then guess_total, pegs = rule_change
+  #   when 4 then return
+  #   end
+  # end
+
   def setup_game(guess_total, pegs, user)
     new_screen
     @game_board = GameBoard.new(guess_total, pegs)
